@@ -47,6 +47,7 @@ class StatusPanel (wx.Panel):
         self.scanPaused = False
         self.scanWaiting = False
         self.paramSaveFile = "%s/scan_monitor_params.txt" % expanduser("~")
+        self.shutter_open_value = 0
 
         self.setupPane = wx.CollapsiblePane(self, wx.ID_ANY, label="Setup Parameters")
         collapsible_pane = self.setupPane.GetPane()
@@ -76,14 +77,18 @@ class StatusPanel (wx.Panel):
         self.detectorPrefixTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
         self.mcsPrefixTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150, 22), style=wx.SIMPLE_BORDER)
         self.savedataPrefixTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150, 22), style=wx.SIMPLE_BORDER)
-        self.us_icTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150, 22), style=wx.SIMPLE_BORDER)
-        self.ds_icTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150, 22), style=wx.SIMPLE_BORDER)
+        self.us_icTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(200, 22), style=wx.SIMPLE_BORDER)
+        self.ds_icTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(200, 22), style=wx.SIMPLE_BORDER)
         self.innerScanTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
         self.outerScanTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
         self.pvStatusTxtCtrl = wx.TextCtrl(self, -1, "Monitor Stopped", size=wx.Size(150,22), style=wx.SIMPLE_BORDER | wx.TE_READONLY | wx.TE_RICH2 | wx.BOLD)
         self.senderTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(200,22), style=wx.SIMPLE_BORDER)
         self.subjectTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(400,22), style=wx.SIMPLE_BORDER)
         self.fileNameTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(400,22), style=wx.SIMPLE_BORDER)
+
+        shutter_value_list = ['zero', 'one']
+        self.shutter_valueRadioBox = wx.RadioBox(collapsible_pane, -1, label="When the shutter is closed, the PV value is:",
+                                                 choices=shutter_value_list, majorDimension=2, style = wx.RA_SPECIFY_COLS)
         
         # Set some properties of the status text
         currentFontSize = self.pvStatusTxtCtrl.GetFont().GetPointSize()
@@ -142,7 +147,7 @@ class StatusPanel (wx.Panel):
 
         collapsible_paneSizer = wx.FlexGridSizer(cols=2, hgap=5, vgap=5)
         collapsible_paneSizer.Add(self.pvLabel, 0, wx.ALIGN_LEFT)
-        collapsible_paneSizer.Add(self.pvTxtCtrl, 0, wx.ALIGN_RIGHT)
+        collapsible_paneSizer.Add(self.pvTxtCtrl, 0, wx.ALIGN_LEFT)
         collapsible_paneSizer.Add(self.shutterLabel, 0, wx.ALIGN_LEFT)
         collapsible_paneSizer.Add(self.shutterTxtCtrl, 0, wx.ALIGN_LEFT)
         collapsible_paneSizer.Add(self.detectorPrefixLabel, 0, wx.ALIGN_LEFT)
@@ -159,6 +164,7 @@ class StatusPanel (wx.Panel):
         collapsible_paneSizer.Add(self.innerScanTxtCtrl, 0, wx.ALIGN_LEFT)
         collapsible_paneSizer.Add(self.outerScanLabel, 0, wx.ALIGN_LEFT)
         collapsible_paneSizer.Add(self.outerScanTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.shutter_valueRadioBox, 0, wx.ALIGN_LEFT)
 
         collapsible_pane.SetSizer(collapsible_paneSizer)
 
@@ -197,7 +203,9 @@ class StatusPanel (wx.Panel):
     def ForceDetectorReset(self, event):
         # Set values in detectorHandler object to those that have ben entered in the GUI
         self.detectorHandler.SetDetectorPVs(self.detectorPrefixTxtCtrl.GetValue(), self.innerScanTxtCtrl.GetValue(), self.outerScanTxtCtrl.GetValue(),
-                                                self.senderTxtCtrl.GetValue(), self.subjectTxtCtrl.GetValue(), self.fileNameTxtCtrl.GetValue())
+                                                self.senderTxtCtrl.GetValue(), self.subjectTxtCtrl.GetValue(), self.fileNameTxtCtrl.GetValue(),
+                                                self.mcsPrefixTxtCtrl.GetValue(), self.savedataPrefixTxtCtrl.GetValue(), self.us_icTxtCtrl.GetValue(),
+                                                self.ds_icTxtCtrl.GetValue())
         
         # Call the ResetDetector function
         self.detectorHandler.TestResetDetector()
@@ -244,6 +252,9 @@ class StatusPanel (wx.Panel):
                         
             line = fileHandle.readline()
             self.outerScanTxtCtrl.SetValue(line.rstrip("\n"))
+
+            line = fileHandle.readline()
+            self.shutter_valueRadioBox.SetSelection(int(line.rstrip("\n")))
                         
             line = fileHandle.readline()
             self.senderTxtCtrl.SetValue(line.rstrip("\n"))
@@ -292,9 +303,10 @@ class StatusPanel (wx.Panel):
             fileHandle.write("%s\n" % self.mcsPrefixTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.savedataPrefixTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.us_icTxtCtrl.GetValue())
-            fileHandle.write("%s\n" % self.dc_icTxtCtrl.GetValue())
+            fileHandle.write("%s\n" % self.ds_icTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.innerScanTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.outerScanTxtCtrl.GetValue())
+            fileHandle.write("%s\n" % self.shutter_valueRadioBox.GetSelection())
             fileHandle.write("%s\n" % self.senderTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.subjectTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.fileNameTxtCtrl.GetValue())
@@ -320,7 +332,9 @@ class StatusPanel (wx.Panel):
 
         try:
             self.detectorHandler.SetDetectorPVs(self.detectorPrefixTxtCtrl.GetValue(), self.innerScanTxtCtrl.GetValue(), self.outerScanTxtCtrl.GetValue(),
-                                                self.senderTxtCtrl.GetValue(), self.subjectTxtCtrl.GetValue(), self.fileNameTxtCtrl.GetValue(), self.mcsPrefixTxtCtrl.GetValue(), self.savedataPrefixTxtCtrl.GetValue(), self.us_icTxtCtrl.GetValue(), self.ds_icTxtCtrl.GetValue())
+                                                self.senderTxtCtrl.GetValue(), self.subjectTxtCtrl.GetValue(), self.fileNameTxtCtrl.GetValue(),
+                                                self.mcsPrefixTxtCtrl.GetValue(), self.savedataPrefixTxtCtrl.GetValue(), self.us_icTxtCtrl.GetValue(),
+                                                self.ds_icTxtCtrl.GetValue())
             self.timer = None
             self.updater = None
             self.scanPaused = None
@@ -334,6 +348,7 @@ class StatusPanel (wx.Panel):
             self.scanWaitCount = PV("%s.WAIT" % self.outerScanTxtCtrl.GetValue())
             self.monitorReady = True
             self.stopMonitorButton.Enable(True)
+            self.shutter_open_value = self.shutter_valueRadioBox.GetSelection()
             
         except:
             dialogBox = wx.MessageDialog(self, "Could not create all data objects",
@@ -354,7 +369,7 @@ class StatusPanel (wx.Panel):
 
         pvValue = kwargs['value']  # This is the value of the PV that is running the callback
 
-        if (pvValue == 0):
+        if (not pvValue == self.shutter_open_value):
             self.scanWaitCount.put(1, False)
             self.shutterTxtCtrl.SetForegroundColour(wx.RED)
             print "%s Shutter is closed" % time.asctime(time.localtime())
