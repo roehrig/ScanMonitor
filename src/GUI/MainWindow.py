@@ -92,6 +92,8 @@ class StatusPanel (wx.Panel):
         self.newFont = wx.Font(currentFontSize, currentFontFamily, currentFontStyle, wx.BOLD, False)
         self.pvStatusTxtCtrl.SetFont(self.newFont)
         self.pvStatusTxtCtrl.SetForegroundColour(wx.RED)
+        self.timerTxtCtrl.SetFont(self.newFont)
+        self.timerTxtCtrl.SetForegroundColour(wx.RED)
 
         # Create some buttons
         self.stopMonitorButton = wx.Button(self, -1, "Stop",size=wx.Size(150,27))
@@ -315,10 +317,10 @@ class StatusPanel (wx.Panel):
         return
     
     def OnSetButtonClick(self, event):
-        
+
         try:
             self.detectorHandler.SetDetectorPVs(self.detectorPrefixTxtCtrl.GetValue(), self.innerScanTxtCtrl.GetValue(), self.outerScanTxtCtrl.GetValue(),
-                                                self.senderTxtCtrl.GetValue(), self.subjectTxtCtrl.GetValue(), self.fileNameTxtCtrl.GetValue())
+                                                self.senderTxtCtrl.GetValue(), self.subjectTxtCtrl.GetValue(), self.fileNameTxtCtrl.GetValue(), self.mcsPrefixTxtCtrl.GetValue(), self.savedataPrefixTxtCtrl.GetValue(), self.us_icTxtCtrl.GetValue(), self.ds_icTxtCtrl.GetValue())
             self.timer = None
             self.updater = None
             self.scanPaused = None

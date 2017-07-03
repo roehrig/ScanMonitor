@@ -85,7 +85,6 @@ class DetectorErrorHandler(object):
             :type ds_ic: str
 
         """
-
         self._detectorPrefix = detector_prefix
         self._innerScan = inner_scan
         self._outerScan = outer_scan
