@@ -16,9 +16,13 @@ class DetectorErrorHandler(object):
     classdocs
     '''
     def __init__(self, email_list):
-        '''
+        """
         Constructor
-        '''
+
+        Args:
+            :param email_list: a list of email addresses
+            :type email_list: list
+        """
         self._detectorPrefix = ""
         self._innerScan = ""
         self._outerScan = ""
@@ -34,7 +38,7 @@ class DetectorErrorHandler(object):
         self._scanWaitPV = None
         self._xmapPixelPV = None
         self._mcsPixelPV = None
-        self._scalerResetPV = None
+        self._mcsResetPV = None
         self._usIonChamberPV = None
         self._dsIonChamberPV = None
         self._innerScanCurrentPointPV = None
@@ -54,10 +58,34 @@ class DetectorErrorHandler(object):
         
     def SetDetectorPVs(self, detector_prefix, inner_scan, outer_scan, sender, subject, file_name, mcs_prefix,
                        savedata_prefix, us_ic, ds_ic):
-        '''
+        """"
         Create the PV objects that are used to correct the
         problem with the detector
-        '''
+
+        Args:
+            :param detector_prefix: the ioc prefix for the fluorescence detector PVs
+            :type detector_prefix: str
+            :param inner_scan: the inner scan record
+            :type inner_scan: str
+            :param outer_scan: the outer scan record
+            :type outer_scan: str
+            :param sender: the email address from which to send the update email
+            :type sender: str
+            :param subject: a subject line for the email
+            :type subject: str
+            :param file_name: a file to write to which contains the email message
+            :type file_name: str
+            :param mcs_prefix: the PV prefix for the multi-channel scaler
+            :type mcs_prefix: str
+            :param savedata_prefix: the PV prefix for saveData
+            :type savedata_prefix:str
+            :param us_ic: a PV for the value of the upstream ion chamber counts
+            :type us_ic: str
+            :param ds_ic: a PV for the value of the downstream ion chamber counts
+            :type ds_ic: str
+
+        """
+
         self._detectorPrefix = detector_prefix
         self._innerScan = inner_scan
         self._outerScan = outer_scan
@@ -82,7 +110,7 @@ class DetectorErrorHandler(object):
         self._collectModePV = PV(self._detectorPrefix + 'CollectMode')
         self._xmapPixelPV = PV(self._detectorPrefix + "dxp1:CurrentPixel")
         self._mcsPixelPV = PV(self._mcs_prefix + "CurrentChannel")
-        self._scalerResetPV = PV(self._mcs_prefix + "StopAll")
+        self._mcsResetPV = PV(self._mcs_prefix + "StopAll")
         
         return        
 
@@ -128,7 +156,7 @@ class DetectorErrorHandler(object):
         self._collectModePV.put(1, False)
         time.sleep(5)
 
-        self._scalerResetPV.put(1,False)
+        self._mcsResetPV.put(1, False)
 
         # Unpause the scan
         print "Resuming scan."
@@ -172,9 +200,14 @@ class DetectorErrorHandler(object):
         return ret_val
 	   
     def WriteStatus(self, reset=False):
-        '''
-        reset - Is this happening because the detectors was reset?
-        '''
+        """
+        Writes an email that contains the current scan status
+
+        Args:
+            :param reset: Is this happening because the detectors was reset?
+            :type reset: bool
+
+        """
         try:
             fileHandle = open(self._file_name, 'w+')
             
