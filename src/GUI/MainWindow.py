@@ -40,35 +40,46 @@ class StatusPanel (wx.Panel):
         self.scanExecuting = None   # This will be a PV object that checks to see if a scan is executing.
         self.scanWaiting = None     # This will be a PV object that checks to see if the scan is waiting.
         self.shutterStatus = None   # This will be a PV object that checks the shutter status
-        self.scanWaitCount = None   # This will be a PV objcet that is used to change the .WCNT field of the scan record.
+        self.scanWaitCount = None   # This will be a PV object that changes the .WCNT field of the scan record.
         self.monitorReady = False
         self.monitorStarted = False
         self.scanExecuting = False
         self.scanPaused = False
         self.scanWaiting = False
         self.paramSaveFile = "%s/scan_monitor_params.txt" % expanduser("~")
+
+        self.setupPane = wx.CollapsiblePane(self, wx.ID_ANY, label="Setup Parameters")
+        collapsible_pane = self.setupPane.GetPane()
         
-        self.pvLabel = wx.StaticText(self, -1, "PV To Monitor", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.pvLabel = wx.StaticText(collapsible_pane, -1, "PV To Monitor", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
         self.timerLabel = wx.StaticText(self, -1, "Check error freq. (sec)", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
         self.updateLabel = wx.StaticText(self, -1, "Update freq. (min)", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
         self.resetsLabel = wx.StaticText(self, -1, "Number of reset tries", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
-        self.shutterLabel = wx.StaticText(self, -1, "Shutter PV", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
-        self.detectorPrefixLabel = wx.StaticText(self, -1, "Detector Prefix", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
-        self.innerScanLabel = wx.StaticText(self, -1, "Inner Scan", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
-        self.outerScanLabel = wx.StaticText(self, -1, "Outer Scan", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.shutterLabel = wx.StaticText(collapsible_pane, -1, "Shutter PV", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.detectorPrefixLabel = wx.StaticText(collapsible_pane, -1, "Detector Prefix", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.mcsPrefixLabel = wx.StaticText(collapsible_pane, -1, "MCS Prefix", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.savedataPrefixLabel = wx.StaticText(collapsible_pane, -1, "SaveData Prefix", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.us_icLabel = wx.StaticText(collapsible_pane, -1, "Upstream IC", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.ds_icLabel = wx.StaticText(collapsible_pane, -1, "Downstream IC", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.innerScanLabel = wx.StaticText(collapsible_pane, -1, "Inner Scan", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
+        self.outerScanLabel = wx.StaticText(collapsible_pane, -1, "Outer Scan", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
         self.pvStatusLabel = wx.StaticText(self, -1, "PV Status", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
         self.senderLabel = wx.StaticText(self, -1, "Email sender", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
         self.subjectLabel = wx.StaticText(self, -1, "Email subject", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
         self.fileNameLabel = wx.StaticText(self, -1, "File name", style=wx.ALIGN_CENTER_VERTICAL | wx.SIMPLE_BORDER)
         
-        self.pvTxtCtrl = PVText(self, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
+        self.pvTxtCtrl = PVText(collapsible_pane, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
         self.timerTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(75,22), style=wx.SIMPLE_BORDER)
         self.updateTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(75,22), style=wx.SIMPLE_BORDER)
         self.resetsTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(75,22), style=wx.SIMPLE_BORDER)
-        self.shutterTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
-        self.detectorPrefixTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
-        self.innerScanTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
-        self.outerScanTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
+        self.shutterTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
+        self.detectorPrefixTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
+        self.mcsPrefixTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150, 22), style=wx.SIMPLE_BORDER)
+        self.savedataPrefixTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150, 22), style=wx.SIMPLE_BORDER)
+        self.us_icTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150, 22), style=wx.SIMPLE_BORDER)
+        self.ds_icTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150, 22), style=wx.SIMPLE_BORDER)
+        self.innerScanTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
+        self.outerScanTxtCtrl = wx.TextCtrl(collapsible_pane, -1, "", size=wx.Size(150,22), style=wx.SIMPLE_BORDER)
         self.pvStatusTxtCtrl = wx.TextCtrl(self, -1, "Monitor Stopped", size=wx.Size(150,22), style=wx.SIMPLE_BORDER | wx.TE_READONLY | wx.TE_RICH2 | wx.BOLD)
         self.senderTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(200,22), style=wx.SIMPLE_BORDER)
         self.subjectTxtCtrl = wx.TextCtrl(self, -1, "", size=wx.Size(400,22), style=wx.SIMPLE_BORDER)
@@ -100,6 +111,10 @@ class StatusPanel (wx.Panel):
         self.resetsTxtCtrl.SetToolTipString("The number of times to reset the timer")
         self.shutterTxtCtrl.SetToolTipString("The PV for the shutter status")
         self.detectorPrefixTxtCtrl.SetToolTipString("The prefix of the detector ioc")
+        self.mcsPrefixTxtCtrl.SetToolTipString("The prefix of the mcs support")
+        self.savedataPrefixTxtCtrl.SetToolTipString("The prefix for the ioc running saveData")
+        self.us_icTxtCtrl.SetToolTipString("The pv for the upstream ion chamber counts")
+        self.ds_icTxtCtrl.SetToolTipString("The pv for the downstream ion chamber counts")
         self.innerScanTxtCtrl.SetToolTipString("The inner scan record name")
         self.outerScanTxtCtrl.SetToolTipString("The outer scan record name")
         self.senderTxtCtrl.SetToolTipString("The address that the email will come from")
@@ -123,23 +138,35 @@ class StatusPanel (wx.Panel):
         self.senderTxtCtrl.SetValue("%s@aps.anl.gov" % getpass.getuser())
         self.fileNameTxtCtrl.SetValue("%s/scan_monitor_status.txt" % expanduser("~"))
 
-        panelSizer = wx.FlexGridSizer(rows=15, cols=2, hgap=5, vgap=5)
-        panelSizer.Add(self.pvLabel, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.pvTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer = wx.FlexGridSizer(cols=2, hgap=5, vgap=5)
+        collapsible_paneSizer.Add(self.pvLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.pvTxtCtrl, 0, wx.ALIGN_RIGHT)
+        collapsible_paneSizer.Add(self.shutterLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.shutterTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.detectorPrefixLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.detectorPrefixTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.mcsPrefixLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.mcsPrefixTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.savedataPrefixLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.savedataPrefixTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.us_icLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.us_icTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.ds_icLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.ds_icTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.innerScanLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.innerScanTxtCtrl, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.outerScanLabel, 0, wx.ALIGN_LEFT)
+        collapsible_paneSizer.Add(self.outerScanTxtCtrl, 0, wx.ALIGN_LEFT)
+
+        collapsible_pane.SetSizer(collapsible_paneSizer)
+
+        panelSizer = wx.FlexGridSizer(rows=16, cols=2, hgap=5, vgap=5)
         panelSizer.Add(self.timerLabel, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.timerTxtCtrl, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.updateLabel, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.updateTxtCtrl, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.resetsLabel, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.resetsTxtCtrl, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.shutterLabel, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.shutterTxtCtrl, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.detectorPrefixLabel, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.detectorPrefixTxtCtrl, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.innerScanLabel, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.innerScanTxtCtrl, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.outerScanLabel, 0, wx.ALIGN_LEFT)
-        panelSizer.Add(self.outerScanTxtCtrl, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.senderLabel, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.senderTxtCtrl, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.subjectLabel, 0, wx.ALIGN_LEFT)
@@ -153,8 +180,13 @@ class StatusPanel (wx.Panel):
         panelSizer.Add(self.loadValuesButton, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.saveValuesButton, 0, wx.ALIGN_LEFT)
         panelSizer.Add(self.testResetFunctionButton, 0, wx.ALIGN_LEFT)
+
+        outer_sizer = wx.BoxSizer(wx.VERTICAL)
+        outer_sizer.Add(self.setupPane, 1, wx.EXPAND | wx.ALL, 5)
+        outer_sizer.Add(panelSizer)
                 
-        self.SetSizer(panelSizer)
+#        self.SetSizer(panelSizer)
+        self.SetSizer(outer_sizer)
         self.Layout()
         self.Fit()
         
@@ -192,6 +224,18 @@ class StatusPanel (wx.Panel):
                         
             line = fileHandle.readline()
             self.detectorPrefixTxtCtrl.SetValue(line.rstrip("\n"))
+
+            line = fileHandle.readline()
+            self.mcsPrefixTxtCtrl.SetValue(line.rstrip("\n"))
+
+            line = fileHandle.readline()
+            self.savedataPrefixTxtCtrl.SetValue(line.rstrip("\n"))
+
+            line = fileHandle.readline()
+            self.us_icTxtCtrl.SetValue(line.rstrip("\n"))
+
+            line = fileHandle.readline()
+            self.ds_icTxtCtrl.SetValue(line.rstrip("\n"))
                         
             line = fileHandle.readline()
             self.innerScanTxtCtrl.SetValue(line.rstrip("\n"))
@@ -243,6 +287,10 @@ class StatusPanel (wx.Panel):
             fileHandle.write("%s\n" % self.resetsTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.shutterTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.detectorPrefixTxtCtrl.GetValue())
+            fileHandle.write("%s\n" % self.mcsPrefixTxtCtrl.GetValue())
+            fileHandle.write("%s\n" % self.savedataPrefixTxtCtrl.GetValue())
+            fileHandle.write("%s\n" % self.us_icTxtCtrl.GetValue())
+            fileHandle.write("%s\n" % self.dc_icTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.innerScanTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.outerScanTxtCtrl.GetValue())
             fileHandle.write("%s\n" % self.senderTxtCtrl.GetValue())
@@ -277,9 +325,9 @@ class StatusPanel (wx.Panel):
             self.scanExecuting = None
             self.timer = PVTimer(self, self.detectorHandler.ResetDetector, self.pvTxtCtrl.GetValue(),True)
             self.updater = PVTimer(self, self.detectorHandler.WriteStatus)
-            self.scanPaused = PV("%s.PAUS" % self.innerScanTxtCtrl.GetValue(),callback=self.ScanStateChange)
-            self.scanExecuting = PV( "%s.EXSC" % self.outerScanTxtCtrl.GetValue(),callback=self.ScanStateChange)
-            self.scanWaiting = PV( "%s.WCNT" % self.outerScanTxtCtrl.GetValue(),callback=self.ScanStateChange)
+            self.scanPaused = PV("%s.PAUS" % self.innerScanTxtCtrl.GetValue(), callback=self.ScanStateChange)
+            self.scanExecuting = PV( "%s.EXSC" % self.outerScanTxtCtrl.GetValue(), callback=self.ScanStateChange)
+            self.scanWaiting = PV( "%s.WCNT" % self.outerScanTxtCtrl.GetValue(), callback=self.ScanStateChange)
             self.shutterStatus = PV("%s" % self.shutterTxtCtrl.GetValue(), callback=self.ShutterChange)
             self.scanWaitCount = PV("%s.WAIT" % self.outerScanTxtCtrl.GetValue())
             self.monitorReady = True
@@ -360,7 +408,7 @@ class StatusPanel (wx.Panel):
                 scanIsRunning = True
                 self.scanExecuting = True
 
-	print "%s Scan state changed." % time.asctime(time.localtime())
+        print "%s Scan state changed." % time.asctime(time.localtime())
         print "Scan state has been changed by %s = %d" % (pvName,pvValue)
         # Since the wait count on the scan record is changed on purpose when
         # the detector handler is running, then don't take any action.
